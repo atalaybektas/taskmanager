@@ -58,7 +58,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // AuthGuard route seviyesinde kontrol yapıyor, burada sadece kullanıcı bilgilerini yüklüyoruz
+    
     const userData = this.authService.getUserData();
     this.currentUser = userData.user;
     this.isAdmin = userData.isAdmin;
@@ -166,7 +166,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // silme onayı dialog'u
+    // silme onayı dialogu
     this.confirmationService.confirm({
       message: 'Bu görevi silmek istediğinize emin misiniz?',
       header: 'Silme Onayı',

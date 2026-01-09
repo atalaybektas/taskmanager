@@ -43,7 +43,7 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
 
   statusOptions = TASK_STATUS_OPTIONS_FOR_DROPDOWN;
 
-  private destroy$ = new Subject<void>(); // component destroy için
+  private destroy$ = new Subject<void>(); 
 
   constructor(
     private fb: FormBuilder,
@@ -178,13 +178,13 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  // template helper - field geçersiz mi kontrol et
+  // template helper  field geçersiz mi kontrol et
   isFieldInvalid(fieldName: string): boolean {
     const field = this.taskForm.get(fieldName);
     return field ? field.invalid && field.touched : false;
   }
 
-  // template helper - kullanıcı rolüne göre css class
+  // template helper kullanıcı rolüne göre css class
   getUserRoleClass(user: User): string {
     return this.taskService.getUserRoleClass(user);
   }

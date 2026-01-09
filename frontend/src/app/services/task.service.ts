@@ -8,14 +8,7 @@ import { TaskFormValue } from '../shared/interfaces/task-form.interface';
 import { Task, TaskRequest, Page, TaskWithStatus } from '../shared/interfaces/task.interface';
 import { User } from '../shared/interfaces/user.interface';
 
-/**
- * task service - görev CRUD işlemleri ve business logic servisi
- * - görev listeleme (pagination ile)
- * - görev oluşturma/güncelleme/silme
- * - status zenginleştirme (label, severity)
- * - form yapılandırması hazırlama
- * - admin/user yetki mantığı
- */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,7 +17,7 @@ export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  // görevleri pagination ile getirir (backend pagination)
+  // görevleri pagination ile getirir
   getTasks(
     status?: string,
     page: number = 0,
@@ -56,7 +49,7 @@ export class TaskService {
     return this.http.delete<void>(`${this.apiUrl}/${taskId}`);
   }
 
-  // görev silme işlemi (task id kontrolü ile)
+  // görev silme işlemi id kontrolü ile
   deleteTaskWithValidation(task: Task): { 
     observable: Observable<void> | null; 
     errorMessage: string | null;
@@ -78,7 +71,7 @@ export class TaskService {
     return option ? option.label : status;
   }
 
-  // status'a göre css severity döndürür (info/warn/success)
+  // status'a göre css severity döndürür renkler icin
   getStatusSeverity(status: string): string {
     switch (status) {
       case 'NEW':
@@ -92,7 +85,7 @@ export class TaskService {
     }
   }
 
-  // form patch value hazırlar (edit modunda form doldurma için)
+  // form patch value hazırlar edit modunda form doldurma için
   prepareFormPatchValue(
     task: Task | null,
     isAdmin: boolean,
@@ -112,7 +105,7 @@ export class TaskService {
     return patchValue;
   }
 
-  // form config hazırlar (reactive forms için)
+  // form config hazırlar reactive forms icin
   prepareFormConfig(
     task: Task | null,
     isAdmin: boolean,
@@ -137,7 +130,7 @@ export class TaskService {
     return formConfig;
   }
 
-  // request body hazırlar (create/update için)
+  // request body hazırlar create/update için
   prepareTaskRequest(
     formValue: TaskFormValue,
     isAdmin: boolean
@@ -167,7 +160,7 @@ export class TaskService {
     return this.createTask(requestBody);
   }
 
-  // task'lara status label ve severity ekler
+  // tasklara status label ve severity ekler
   enrichTasksWithStatus(tasks: Task[]): TaskWithStatus[] {
     return tasks.map(task => ({
       ...task,
@@ -178,7 +171,7 @@ export class TaskService {
     }));
   }
 
-  // yeni task objesi oluşturur (default değerlerle)
+  // yeni task objesi oluşturur defaultlarla
   createNewTask(): Task {
     return {
       title: '',
@@ -187,7 +180,7 @@ export class TaskService {
     };
   }
 
-  // edit/create moduna göre form label'larını döndürür
+  // edit/create moduna göre form labellarını döndürür
   getFormLabels(isEditMode: boolean): {
     dialogTitle: string;
     saveButtonLabel: string;

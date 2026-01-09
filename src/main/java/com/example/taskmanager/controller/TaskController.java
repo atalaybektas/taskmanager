@@ -10,10 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * task controller - görev CRUD işlemleri için REST API
- * HTTP request'i alır, Command/Query'ye map eder, service'e gönderir
- */
+
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -25,7 +22,7 @@ public class TaskController {
         this.taskApplicationService = taskApplicationService;
     }
     
-    // görevleri pagination ile getirir (role-based: admin tümü, user sadece kendi)
+    
     @GetMapping
     public ResponseEntity<Page<TaskResponse>> getAllTasks(
             @ModelAttribute GetAllTasksRequest request,
@@ -41,7 +38,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
     
-    // yeni görev oluşturur (admin: herhangi bir kullanıcıya, user: sadece kendine)
+   
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest request) {
         CreateTaskCommand command = new CreateTaskCommand();
@@ -54,7 +51,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
     
-    // görev günceller (admin: herkesin, user: sadece kendi)
+   
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(
             @PathVariable Long id,
@@ -70,7 +67,7 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
     
-    // görev siler (admin: herkesin, user: sadece kendi)
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         DeleteTaskCommand command = new DeleteTaskCommand();

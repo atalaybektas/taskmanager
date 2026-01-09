@@ -5,10 +5,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ErrorHandlerService {
-  /**
-   * HTTP error'dan kullanıcı dostu mesaj çıkarır
-   * UI yönetimi component'lerde yapılmalı (MessageService kullanarak)
-   */
+  
+  //HTTP errordan  mesaj çıkarır
+   
+   
   handleError(error: HttpErrorResponse, defaultMessage: string): string {
     if (error.error) {
       if (typeof error.error === 'string') {

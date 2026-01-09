@@ -9,14 +9,7 @@ import { LoginResponse } from '../../shared/interfaces/user.interface';
 import { ErrorHandlerService } from '../../core/services/error-handler.service';
 import { LoggerService } from '../../core/services/logger.service';
 
-/**
- * login component - kullanıcı girişi yapar
- * - reactive forms ile form validation
- * - jwt token alır ve localStorage'a kaydeder
- * - başarılı olursa router ile /tasks sayfasına yönlendirir
- * - rxjs takeUntil ile memory leak önler
- * - primeng toast ile mesaj gösterir
- */
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -25,7 +18,7 @@ import { LoggerService } from '../../core/services/logger.service';
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   loading = false;
-  private destroy$ = new Subject<void>(); // component destroy için
+  private destroy$ = new Subject<void>(); 
 
   constructor(
     private fb: FormBuilder,
@@ -37,7 +30,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // LoginGuard route seviyesinde kontrol yapıyor, burada sadece form'u oluşturuyoruz
+   
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
@@ -87,7 +80,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  // template helper - field geçersiz mi kontrol et
+  // template helper ,field geçersiz mi kontrol et
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return field ? field.invalid && field.touched : false;

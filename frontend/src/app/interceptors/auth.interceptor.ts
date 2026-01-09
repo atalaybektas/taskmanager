@@ -17,10 +17,10 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private router: Router) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    // Get token from localStorage
+    // localStorage den get token
     const token = localStorage.getItem(this.tokenKey);
 
-    // Clone request and add Authorization header if token exists
+    // clone request add Authorization header if token varsa
     if (token) {
       request = request.clone({
         setHeaders: {
@@ -31,7 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        // If 401 Unauthorized, redirect to login
+        // if 401 unauthorized Login e geri yonlendir
         if (error.status === 401) {
           localStorage.removeItem(this.tokenKey);
           localStorage.removeItem('currentUser');

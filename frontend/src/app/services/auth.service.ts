@@ -6,14 +6,7 @@ import { environment } from '../../environments/environment';
 import { Task } from '../shared/interfaces/task.interface';
 import { User, Role, LoginRequest, LoginResponse } from '../shared/interfaces/user.interface';
 
-/**
- * auth service - kullanıcı kimlik doğrulama ve yetkilendirme servisi
- * - login/logout işlemleri
- * - jwt token yönetimi (localStorage)
- * - kullanıcı bilgileri yönetimi
- * - yetki kontrolleri (admin/user)
- * - görev yetki kontrolleri (edit/delete)
- */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,7 +17,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // login işlemi, jwt token ve kullanıcı bilgisini localStorage'a kaydeder
+  // login username ve password gönderilir ve response olarak token ve user bilgileri döner
   login(username: string, password: string): Observable<LoginResponse> {
     const request: LoginRequest = { username, password };
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request)

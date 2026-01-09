@@ -15,7 +15,7 @@ export class LoggerService {
     if (!environment.production) {
       console.error(message, ...args);
     }
-    // Production'da error tracking service'e gönderilebilir (Sentry, etc.)
+   
   }
 
   warn(message: string, ...args: any[]): void {

@@ -35,7 +35,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     @Override
     @Transactional(readOnly = true)
     public LoginResponse login(LoginCommand command) {
-        // Username and password validation is handled by Bean Validation at controller level
+        // Username  password validation controller da Bean Validation ile yapılır
         String username = command.getUsername();
         String password = command.getPassword();
         

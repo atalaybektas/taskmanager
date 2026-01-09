@@ -2,22 +2,18 @@ package com.example.taskmanager.command;
 
 import com.example.taskmanager.entity.TaskStatus;
 
-/**
- * Update Task use case command
- * currentUserId is obtained from SecurityContext in service layer
- */
+
 public class UpdateTaskCommand {
     private Long taskId;
-    private Long targetUserId; // For ADMIN: can change task owner (optional)
+    private Long targetUserId; 
     private String title;
     private String description;
     private TaskStatus status;
     
-    // Constructors
+   
     public UpdateTaskCommand() {
     }
     
-    // Getters and Setters
     public Long getTaskId() {
         return taskId;
     }

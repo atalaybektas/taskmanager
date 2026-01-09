@@ -1,6 +1,4 @@
-/**
- * Task model interface
- */
+
 export interface Task {
   id?: number;
   title: string;
@@ -13,20 +11,16 @@ export interface Task {
   };
 }
 
-/**
- * Task request interface for create/update operations
- */
+
 export interface TaskRequest {
   title: string;
   description?: string;
   status?: 'NEW' | 'IN_PROGRESS' | 'DONE';
-  targetUserId?: number; // For ADMIN: can create/update tasks for other users
+  targetUserId?: number; // sadece admin icin
 }
 
-/**
- * Spring Boot Page response structure
- * Backend returns Page<TaskResponse>, Angular uses page.content
- */
+
+//Spring Boot Page response  structure
 export interface Page<T> {
   content: T[];
   totalElements: number;
@@ -39,9 +33,9 @@ export interface Page<T> {
   empty: boolean;
 }
 
-/**
- * Task with enriched status information
- */
+
+//Task with enriched status bilgisi
+ 
 export interface TaskWithStatus extends Task {
   statusLabel: string;
   statusSeverity: string;

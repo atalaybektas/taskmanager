@@ -6,10 +6,9 @@ import com.example.taskmanager.dto.UserResponse;
 
 import java.util.List;
 
-/**
- * user application service - kullanıcı işlemleri için business logic interface
- * login, kullanıcı listesi ve test kullanıcı oluşturma
- */
+
+ //login, kullanıcı listesi ve test kullanıcı oluşturma başlangıçta
+ 
 public interface UserApplicationService {
     
     // kullanıcı girişi yapar, jwt token döner
