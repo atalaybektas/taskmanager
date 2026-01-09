@@ -23,10 +23,7 @@ public class UserController {
         this.userApplicationService = userApplicationService;
     }
     
-    /**
-     * Login endpoint
-     * POST /api/users/login
-     */
+   
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginCommand command = new LoginCommand();
@@ -37,11 +34,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * Tüm kullanıcıları getirir
-     * Admin paneli için kullanılır
-     * GET /api/users
-     */
+   
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> responses = userApplicationService.getAllUsers();

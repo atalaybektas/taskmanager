@@ -3,9 +3,9 @@ package com.example.taskmanager.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-/**
- * Utility class for accessing SecurityContext
- */
+
+ // SecurityContext den mevcut kullanıcının userId'sini almak için kullanılır
+ 
 public class SecurityUtils {
     
     /**

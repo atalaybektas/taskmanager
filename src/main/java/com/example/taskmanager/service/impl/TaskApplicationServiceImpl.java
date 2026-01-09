@@ -42,16 +42,16 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
         
         // Pagination parametrelerini al (default değerler)
         int page = query.getPage() != null && query.getPage() >= 0 ? query.getPage() : 0;
-        int size = 10; // Sabit: Her zaman 10 görev gösterilir (kullanıcı değiştiremez)
+        int size = 10; // Sabit: Her zaman 10 görev gösterilir 
         
-        // Sort parametresini parse et
+        // gelen sort parametresini al (parse et)
         Sort sort = parseSort(query.getSort());
         Pageable pageable = PageRequest.of(page, size, sort);
         
         TaskStatus status = query.getStatus();
         Page<Task> taskPage;
         
-        // Business logic: Role-based ve status-based filtering
+        // filtreleme işlemi status a gore admin user kontroluyle
         boolean isAdmin = Role.ADMIN.equals(currentUser.getRole());
         
         if (status != null) {
@@ -85,11 +85,9 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
         ));
     }
     
-    /**
-     * Sort string'ini Spring Data Sort objesine çevirir
-     * Format: "field,direction" (örn: "createdDate,desc" veya "title,asc")
-     * Default: "createdDate,desc" (en yeni önce)
-     */
+    
+    // String formatındaki sort bilgisini Spring Sort objesine çevirir
+    // paremetre yoksa default date e gore descending yap
     private Sort parseSort(String sortString) {
         if (sortString == null || sortString.trim().isEmpty()) {
             return Sort.by(Sort.Direction.DESC, "createdDate");
@@ -115,14 +113,14 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
     public TaskResponse createTask(CreateTaskCommand command) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         
-        // Title validation is handled by Bean Validation at controller level
+        // Title validation controller da Bean Validation ile yapılır
         String title = command.getTitle();
         Long targetUserId = command.getTargetUserId() != null ? command.getTargetUserId() : currentUserId;
         
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Current user not found"));
         
-        // Authorization - Service katmanında
+        // Authorization - admin kontrolu yapılır
         boolean isAdmin = Role.ADMIN.equals(currentUser.getRole());
         if (!isAdmin && !currentUserId.equals(targetUserId)) {
             throw new UnauthorizedException("You can only create tasks for yourself");
@@ -131,11 +129,12 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
         User targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Target user not found"));
         
-        // Entity oluştur - basit constructor kullan
+        // entity oluştur constructorıyla
         Task task = new Task();
         task.setTitle(title.trim());
         task.setDescription(command.getDescription());
-        // Frontend'den gelen status'u kullan, yoksa default olarak NEW
+
+        // Frontend'den gelen status'u kullan, yoksa default olarak NEW atanır
         task.setStatus(command.getStatus() != null ? command.getStatus() : TaskStatus.NEW);
         task.setUser(targetUser);
         task.setCreatedDate(LocalDateTime.now());
@@ -158,7 +157,7 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
     public TaskResponse updateTask(UpdateTaskCommand command) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         
-        // Title validation is handled by Bean Validation at controller level
+        // Title validation controller da Bean Validation ile yapılır
         String title = command.getTitle();
         
         User currentUser = userRepository.findById(currentUserId)
@@ -167,18 +166,18 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
         Task task = taskRepository.findById(command.getTaskId())
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         
-        // Authorization - Service katmanında
+        // Authorization 
         boolean isAdmin = Role.ADMIN.equals(currentUser.getRole());
         if (!isAdmin && !task.getUser().getId().equals(currentUserId)) {
             throw new UnauthorizedException("You can only update your own tasks");
         }
         
-        // Güncelle - direkt setter kullan
+        // Güncelle 
         task.setTitle(title.trim());
         task.setDescription(command.getDescription());
         task.setStatus(command.getStatus());
         
-        // ADMIN görevin sahibini değiştirebilir
+        // sadece admin görevin sahibini değiştirebilir
         Long targetUserId = command.getTargetUserId();
         if (isAdmin && targetUserId != null && !targetUserId.equals(task.getUser().getId())) {
             User targetUser = userRepository.findById(targetUserId)

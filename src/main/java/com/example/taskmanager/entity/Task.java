@@ -28,11 +28,11 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    // Public constructor for JPA and Service layer
+    
     public Task() {
     }
     
-    // Getters
+   
     public Long getId() {
         return id;
     }
@@ -57,7 +57,7 @@ public class Task {
         return user;
     }
     
-    // Setters - Business logic ve validation Service katmanında yapılır
+   
     public void setTitle(String title) {
         this.title = title;
     }

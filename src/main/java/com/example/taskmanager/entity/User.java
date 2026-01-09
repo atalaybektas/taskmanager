@@ -20,7 +20,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
     
-    // Public constructor for JPA and Service layer
+   
     public User() {
     }
     
@@ -41,7 +41,7 @@ public class User {
         return role;
     }
     
-    // Setters
+    
     public void setUsername(String username) {
         this.username = username;
     }

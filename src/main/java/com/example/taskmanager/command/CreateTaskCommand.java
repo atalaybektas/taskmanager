@@ -2,21 +2,18 @@ package com.example.taskmanager.command;
 
 import com.example.taskmanager.entity.TaskStatus;
 
-/**
- * Create Task use case command
- * currentUserId is obtained from SecurityContext in service layer
- */
+
 public class CreateTaskCommand {
     private Long targetUserId; // For ADMIN: can create tasks for other users (optional)
     private String title;
     private String description;
     private TaskStatus status;
     
-    // Constructors
+    
     public CreateTaskCommand() {
     }
     
-    // Getters and Setters
+    
     
     public Long getTargetUserId() {
         return targetUserId;

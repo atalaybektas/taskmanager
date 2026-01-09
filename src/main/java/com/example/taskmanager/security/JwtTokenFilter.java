@@ -15,9 +15,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * JWT Token Filter - Extracts token from Authorization header and sets SecurityContext
- */
+
+  //JWT Token Filter - Extracts token from Authorization header and sets SecurityContext
+ 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
     
@@ -35,7 +35,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
             
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                // Get userId from token (more efficient than username lookup)
+                // Token doğrulandıysa Tokenden GET userId 
                 Long userId = tokenProvider.getUserIdFromToken(jwt);
                 
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
