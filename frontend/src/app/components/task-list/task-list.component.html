@@ -1,0 +1,124 @@
+<div class="task-list-container">
+  <div class="header">
+    <div>
+      <h1>{{ pageTitle }}</h1>
+      <p>Hoş geldiniz, {{ username }}! <span *ngIf="showAdminBadge" class="admin-badge">(Admin yetkisi)</span></p>
+    </div>
+    <div class="header-actions">
+      <p-button
+        label="Yeni Görev"
+        icon="pi pi-plus"
+        (onClick)="openNewTaskDialog()"
+        styleClass="p-button-success"
+      ></p-button>
+      <p-button
+        label="Çıkış Yap"
+        icon="pi pi-sign-out"
+        (onClick)="logout()"
+        styleClass="p-button-secondary"
+      ></p-button>
+    </div>
+  </div>
+
+  <p-card>
+    <div class="filter-section">
+      <label>Durum Filtresi:</label>
+      <p-dropdown
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatus"
+        (onChange)="onStatusFilterChange()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Tümü"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <!-- Backend Pagination Info -->
+    <div class="pagination-info" *ngIf="page">
+      <span>Toplam {{ totalElements }} görev ({{ totalPages }} sayfa)</span>
+    </div>
+
+    <p-table
+      [value]="tasksWithStatus"
+      [loading]="loading"
+      [paginator]="false"
+      styleClass="p-datatable-striped"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Başlık</th>
+          <th>Açıklama</th>
+          <th>Durum</th>
+          <th>Oluşturulma Tarihi</th>
+          <th>Sahibi</th>
+          <th>İşlemler</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-task>
+        <tr>
+          <td>{{ task.title }}</td>
+          <td>{{ task.description }}</td>
+          <td>
+            <span
+              class="status-badge"
+              [ngClass]="'status-' + task.statusSeverity"
+            >
+              {{ task.statusLabel }}
+            </span>
+          </td>
+          <td>{{ task.createdDate | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <span class="user-badge">
+              <i class="pi pi-user"></i>
+              {{ task.ownerName }}
+            </span>
+          </td>
+          <td>
+            <p-button
+              icon="pi pi-pencil"
+              (onClick)="openEditTaskDialog(task)"
+              styleClass="p-button-rounded p-button-text p-button-primary"
+              pTooltip="Düzenle"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              (onClick)="deleteTask(task)"
+              styleClass="p-button-rounded p-button-text p-button-danger"
+              pTooltip="Sil"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            <p>Henüz görev bulunmamaktadır.</p>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- Backend Pagination (PrimeNG Paginator) -->
+    <p-paginator
+      *ngIf="page && totalElements > 0"
+      [rows]="pageSize"
+      [totalRecords]="totalElements"
+      [first]="currentPage * pageSize"
+      (onPageChange)="onPageChange($event)"
+      styleClass="mt-3"
+    ></p-paginator>
+  </p-card>
+
+  <!-- Task Form Dialog -->
+  <app-task-form
+    *ngIf="selectedTask"
+    [task]="selectedTask"
+    [isEditMode]="isEditMode"
+    [visible]="displayDialog"
+    (close)="closeDialog()"
+    (saved)="onTaskSaved()"
+  ></app-task-form>
+</div>
+
+

@@ -1,0 +1,121 @@
+.task-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 28px;
+}
+
+.header p {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-section label {
+  font-weight: 500;
+  color: #333;
+}
+
+::ng-deep .w-full {
+  width: 100%;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-info {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-warn {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-success {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+/* Status Dropdown Styling */
+.status-dropdown {
+  border-radius: 4px;
+}
+
+.status-dropdown.status-info ::ng-deep .p-dropdown {
+  border-color: #2196F3;
+}
+
+.status-dropdown.status-warn ::ng-deep .p-dropdown {
+  border-color: #FF9800;
+}
+
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #555;
+}
+
+.user-badge i {
+  font-size: 12px;
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: white;
+  color: #333;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.text-center {
+  text-align: center;
+  padding: 20px;
+}
+
+::ng-deep .p-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+

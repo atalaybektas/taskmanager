@@ -1,0 +1,113 @@
+<p-dialog
+  [header]="dialogTitle"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [closable]="true"
+  (onHide)="onCancel()"
+>
+  <form [formGroup]="taskForm">
+    <div class="form-group">
+      <label for="title">Başlık <span class="required">*</span></label>
+      <input
+        id="title"
+        type="text"
+        pInputText
+        formControlName="title"
+        placeholder="Görev başlığını girin"
+        [class.ng-invalid]="isFieldInvalid('title')"
+      />
+      <small *ngIf="isFieldInvalid('title')" class="p-error">
+        Başlık gereklidir
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Açıklama</label>
+      <textarea
+        id="description"
+        pInputTextarea
+        formControlName="description"
+        placeholder="Görev açıklamasını girin (opsiyonel)"
+        [rows]="4"
+      ></textarea>
+    </div>
+
+    <!-- Admin için kullanıcı seçimi -->
+    <div class="form-group" *ngIf="showUserSelector">
+      <label for="targetUserId">Görev Sahibi <span class="required">*</span></label>
+      <p-dropdown
+        id="targetUserId"
+        [options]="users"
+        formControlName="targetUserId"
+        optionLabel="username"
+        optionValue="id"
+        placeholder="Kullanıcı seçin"
+        styleClass="w-full"
+        [loading]="loadingUsers"
+        [filter]="true"
+        filterBy="username"
+        [showClear]="false"
+        [scrollHeight]="'250px'"
+        [appendTo]="'body'"
+        [autoZIndex]="true"
+        [baseZIndex]="10000"
+        panelStyleClass="user-dropdown-panel"
+      >
+        <ng-template let-user pTemplate="item">
+          <div class="user-option">
+            <span>{{ user.username }}</span>
+            <span class="user-role-badge" [ngClass]="getUserRoleClass(user)">
+              {{ user.role }}
+            </span>
+          </div>
+        </ng-template>
+      </p-dropdown>
+      <small *ngIf="isFieldInvalid('targetUserId')" class="p-error">
+        Görev sahibi seçilmelidir
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label for="status">Durum <span class="required">*</span></label>
+      <p-dropdown
+        id="status"
+        [options]="statusOptions"
+        formControlName="status"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Durum seçin"
+        styleClass="w-full"
+        [autoDisplayFirst]="false"
+        [filter]="false"
+        [scrollHeight]="'250px'"
+        [virtualScroll]="false"
+        [appendTo]="'body'"
+        [autoZIndex]="true"
+        [baseZIndex]="10000"
+        panelStyleClass="status-dropdown-panel"
+      ></p-dropdown>
+      <small *ngIf="isFieldInvalid('status')" class="p-error">
+        Durum gereklidir
+      </small>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="İptal"
+      icon="pi pi-times"
+      (onClick)="onCancel()"
+      styleClass="p-button-text"
+    ></p-button>
+    <p-button
+      [label]="saveButtonLabel"
+      icon="pi pi-check"
+      (onClick)="onSave()"
+      [loading]="loading"
+      [disabled]="taskForm.invalid"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+

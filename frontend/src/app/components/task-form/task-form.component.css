@@ -1,0 +1,78 @@
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+::ng-deep .w-full {
+  width: 100%;
+}
+
+/* Dropdown panel için özel stil - tüm seçeneklerin görünmesi için */
+::ng-deep .status-dropdown-panel,
+::ng-deep .user-dropdown-panel {
+  max-height: 250px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+::ng-deep .status-dropdown-panel .p-dropdown-items-wrapper,
+::ng-deep .user-dropdown-panel .p-dropdown-items-wrapper {
+  max-height: 250px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+::ng-deep .status-dropdown-panel .p-dropdown-item,
+::ng-deep .user-dropdown-panel .p-dropdown-item {
+  padding: 0.75rem 1rem !important;
+  white-space: nowrap !important;
+}
+
+/* User dropdown için özel stil - scroll'un sayfa scroll'unu tetiklememesi için */
+::ng-deep .user-dropdown-panel .p-dropdown-items-wrapper {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.user-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.user-role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.user-role-badge.role-admin {
+  background-color: #ff9800;
+  color: white;
+}
+
+.user-role-badge.role-user {
+  background-color: #2196F3;
+  color: white;
+}
+
+
