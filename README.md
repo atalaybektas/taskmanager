@@ -1,6 +1,6 @@
 # Task Manager
 
-Görev yönetimi için geliştirilmiş full-stack web uygulaması.
+Backend'de spring boot, ön yüz olarak Angular framework'ü ile geliştirilmiş bir iş takip uygulamasıdır.
 
 ## Proje Nasıl Çalıştırılır?
 
