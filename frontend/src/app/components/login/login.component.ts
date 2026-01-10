@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { LoginResponse } from '../../shared/interfaces/user.interface';
-import { ErrorHandlerService } from '../../core/services/error-handler.service';
-import { LoggerService } from '../../core/services/logger.service';
+import { getErrorMessage } from '../../shared/utils/error.utils';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -24,8 +25,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private errorHandler: ErrorHandlerService,
-    private logger: LoggerService,
     private messageService: MessageService
   ) {}
 
@@ -56,11 +55,13 @@ export class LoginComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             this.loading = false;
-            const errorMessage = this.errorHandler.handleError(
-              error,
+            const errorMessage = getErrorMessage(
+              error as HttpErrorResponse,
               'Kullanıcı adı veya şifre hatalı!'
             );
-            this.logger.error('Login hatası:', error);
+            if (!environment.production) {
+              console.error('Login hatası:', error);
+            }
             this.messageService.add({
               severity: 'error',
               summary: 'Hata',

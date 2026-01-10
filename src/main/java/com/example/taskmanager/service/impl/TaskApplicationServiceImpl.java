@@ -74,6 +74,7 @@ public class TaskApplicationServiceImpl implements TaskApplicationService {
         }
         
         // Entity'den DTO'ya dönüşüm (Page mapping)
+        
         return taskPage.map(task -> new TaskResponse(
             task.getId(),
             task.getTitle(),

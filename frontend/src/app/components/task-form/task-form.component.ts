@@ -1,18 +1,18 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
-import { ErrorHandlerService } from '../../core/services/error-handler.service';
-import { LoggerService } from '../../core/services/logger.service';
 import { Task } from '../../shared/interfaces/task.interface';
 import { User } from '../../shared/interfaces/user.interface';
 import { TaskFormValue } from '../../shared/interfaces/task-form.interface';
-import { TASK_STATUS_OPTIONS_FOR_DROPDOWN } from '../../shared/constants/task.constants';
-import { UI_CONSTANTS } from '../../core/constants/ui.constants';
+import { TASK_STATUS_OPTIONS_FOR_DROPDOWN, TASK_FORM_LABELS } from '../../shared/constants/task.constants';
+import { prepareFormConfig, prepareFormPatchValue, prepareTaskRequest } from '../../shared/utils/form.utils';
+import { getErrorMessage } from '../../shared/utils/error.utils';
+import { environment } from '../../../environments/environment';
 
 
  //görev oluşturma ve düzenleme formu
@@ -49,33 +49,28 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
     private fb: FormBuilder,
     private taskService: TaskService,
     private authService: AuthService,
-    private errorHandler: ErrorHandlerService,
-    private logger: LoggerService,
     private messageService: MessageService
   ) {}
 
-  
   ngOnInit(): void {
-    const userData = this.authService.getUserData();
-    this.currentUser = userData.user;
-    this.isAdmin = userData.isAdmin;
-    this.showUserSelector = userData.shouldLoadUsers;
+    this.currentUser = this.authService.getCurrentUser();
+    this.isAdmin = this.authService.isAdmin();
+    this.showUserSelector = this.isAdmin;
     
     // edit/create moduna göre label'ları al
-    const labels = this.taskService.getFormLabels(this.isEditMode);
+    const labels = this.isEditMode ? TASK_FORM_LABELS.EDIT : TASK_FORM_LABELS.CREATE;
     this.dialogTitle = labels.dialogTitle;
     this.saveButtonLabel = labels.saveButtonLabel;
     this.successMessage = labels.successMessage;
     this.errorMessage = labels.errorMessage;
     
-    if (userData.shouldLoadUsers) {
+    if (this.isAdmin) {
       this.loadUsers();
     }
     
     this.initForm();
   }
 
-  
   loadUsers(): void {
     this.loadingUsers = true;
     this.authService.getAllUsers()
@@ -87,7 +82,9 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
         },
         error: (error: unknown) => {
           this.loadingUsers = false;
-          this.logger.error('Kullanıcılar yüklenirken hata:', error);
+          if (!environment.production) {
+            console.error('Kullanıcılar yüklenirken hata:', error);
+          }
           this.messageService.add({
             severity: 'error',
             summary: 'Hata',
@@ -99,7 +96,7 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(): void {
     // input değiştiğinde label'ları güncelle
-    const labels = this.taskService.getFormLabels(this.isEditMode);
+    const labels = this.isEditMode ? TASK_FORM_LABELS.EDIT : TASK_FORM_LABELS.CREATE;
     this.dialogTitle = labels.dialogTitle;
     this.saveButtonLabel = labels.saveButtonLabel;
     this.successMessage = labels.successMessage;
@@ -108,7 +105,7 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
     if (this.taskForm) {
       // form varsa değerleri güncelle
       const hasTargetUserIdField = !!this.taskForm.get('targetUserId');
-      const patchValue = this.taskService.prepareFormPatchValue(
+      const patchValue = prepareFormPatchValue(
         this.task,
         this.isAdmin,
         this.isEditMode,
@@ -122,7 +119,7 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   initForm(): void {
-    const formConfig = this.taskService.prepareFormConfig(
+    const formConfig = prepareFormConfig(
       this.task,
       this.isAdmin,
       this.isEditMode,
@@ -145,13 +142,14 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
     this.loading = true;
     const formValue: TaskFormValue = this.taskForm.value;
     
-    const requestBody = this.taskService.prepareTaskRequest(
-      formValue,
-      this.isAdmin
-    );
+    const requestBody = prepareTaskRequest(formValue, this.isAdmin);
 
     // create veya update işlemi
-    this.taskService.saveTask(this.task?.id, requestBody, this.isEditMode)
+    const taskObservable = this.isEditMode && this.task?.id
+      ? this.taskService.updateTask(this.task.id, requestBody)
+      : this.taskService.createTask(requestBody);
+
+    taskObservable
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: Task) => {
@@ -164,8 +162,10 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
         },
         error: (error: HttpErrorResponse) => {
           this.loading = false;
-          const errorMessage = this.errorHandler.handleError(error, this.errorMessage);
-          this.logger.error('Görev kaydetme hatası:', error);
+          const errorMessage = getErrorMessage(error, this.errorMessage);
+          if (!environment.production) {
+            console.error('Görev kaydetme hatası:', error);
+          }
           this.messageService.add({
             severity: 'error',
             summary: 'Hata',
@@ -186,7 +186,7 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
 
   // template helper kullanıcı rolüne göre css class
   getUserRoleClass(user: User): string {
-    return this.taskService.getUserRoleClass(user);
+    return user.role ? `role-${user.role.toLowerCase()}` : '';
   }
 
   onCancel(): void {

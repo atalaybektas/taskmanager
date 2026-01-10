@@ -6,14 +6,14 @@ import { takeUntil } from 'rxjs/operators';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
-import { ErrorHandlerService } from '../../core/services/error-handler.service';
-import { LoggerService } from '../../core/services/logger.service';
 import { Task, Page, TaskWithStatus } from '../../shared/interfaces/task.interface';
-import { User } from '../../shared/interfaces/user.interface';
+import { User, Role } from '../../shared/interfaces/user.interface';
 import { PaginatorEvent } from '../../shared/interfaces/paginator-event.interface';
 import { PAGINATION_CONSTANTS } from '../../core/constants/pagination.constants';
 import { UI_CONSTANTS } from '../../core/constants/ui.constants';
 import { TASK_STATUS_OPTIONS } from '../../shared/constants/task.constants';
+import { getErrorMessage } from '../../shared/utils/error.utils';
+import { environment } from '../../../environments/environment';
 
 // login sonrası görev listesi sayfası
 @Component({
@@ -51,20 +51,16 @@ export class TaskListComponent implements OnInit, OnDestroy {
     private taskService: TaskService,
     private authService: AuthService,
     private router: Router,
-    private errorHandler: ErrorHandlerService,
-    private logger: LoggerService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
-    
-    const userData = this.authService.getUserData();
-    this.currentUser = userData.user;
-    this.isAdmin = userData.isAdmin;
-    this.pageTitle = userData.pageTitle;
-    this.username = userData.username;
-    this.showAdminBadge = userData.showAdminBadge;
+    this.currentUser = this.authService.getCurrentUser();
+    this.isAdmin = this.authService.isAdmin();
+    this.username = this.currentUser?.username || '';
+    this.pageTitle = this.isAdmin ? 'Tüm Görevler' : 'Görevlerim';
+    this.showAdminBadge = this.isAdmin;
 
     this.loadTasks();
   }
@@ -86,17 +82,16 @@ export class TaskListComponent implements OnInit, OnDestroy {
         this.totalPages = page.totalPages;
         
         // status bilgilerini zenginleştir
-        this.tasksWithStatus = this.taskService.enrichTasksWithStatus(page.content);
+        this.tasksWithStatus = this.enrichTasksWithStatus(page.content);
         
         this.loading = false;
       },
       error: (error: unknown) => {
         this.loading = false;
-        const errorMessage = this.errorHandler.handleError(
-          error as HttpErrorResponse,
-          'Görevler yüklenirken bir hata oluştu!'
-        );
-        this.logger.error('Görev yükleme hatası:', error);
+        const errorMessage = getErrorMessage(error as HttpErrorResponse, 'Görevler yüklenirken bir hata oluştu!');
+        if (!environment.production) {
+          console.error('Görev yükleme hatası:', error);
+        }
         this.messageService.add({
           severity: 'error',
           summary: 'Hata',
@@ -118,19 +113,22 @@ export class TaskListComponent implements OnInit, OnDestroy {
   }
 
   openNewTaskDialog(): void {
-    this.selectedTask = this.taskService.createNewTask();
+    this.selectedTask = {
+      title: '',
+      description: '',
+      status: 'NEW'
+    };
     this.isEditMode = false;
     this.displayDialog = true;
   }
 
   openEditTaskDialog(task: Task): void {
     // yetki kontrolü
-    const validation = this.authService.validateEditPermission(task, this.currentUser);
-    if (!validation.canEdit) {
+    if (!this.canEditTask(task)) {
       this.messageService.add({
         severity: 'error',
         summary: 'Yetki Hatası',
-        detail: validation.errorMessage
+        detail: 'Sadece kendi görevlerinizi düzenleyebilirsiniz!'
       });
       return;
     }
@@ -156,12 +154,20 @@ export class TaskListComponent implements OnInit, OnDestroy {
 
   deleteTask(task: Task): void {
     // yetki kontrolü
-    const validation = this.authService.validateDeletePermission(task, this.currentUser);
-    if (!validation.canDelete) {
+    if (!this.canDeleteTask(task)) {
       this.messageService.add({
         severity: 'error',
         summary: 'Yetki Hatası',
-        detail: validation.errorMessage
+        detail: 'Sadece kendi görevlerinizi silebilirsiniz!'
+      });
+      return;
+    }
+
+    if (!task.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Hata',
+        detail: 'Görev ID bulunamadı!'
       });
       return;
     }
@@ -174,17 +180,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
       acceptLabel: 'Evet',
       rejectLabel: 'Hayır',
       accept: () => {
-        const deleteResult = this.taskService.deleteTaskWithValidation(task);
-        if (!deleteResult.observable) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Hata',
-            detail: deleteResult.errorMessage || 'Görev silinemedi!'
-          });
-          return;
-        }
-
-        deleteResult.observable
+        this.taskService.deleteTask(task.id!)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
@@ -196,11 +192,13 @@ export class TaskListComponent implements OnInit, OnDestroy {
               this.loadTasks();
             },
             error: (error: unknown) => {
-              const errorMessage = this.errorHandler.handleError(
+              const errorMessage = getErrorMessage(
                 error as HttpErrorResponse,
                 'Görev silinirken bir hata oluştu!'
               );
-              this.logger.error('Görev silme hatası:', error);
+              if (!environment.production) {
+                console.error('Görev silme hatası:', error);
+              }
               this.messageService.add({
                 severity: 'error',
                 summary: 'Hata',
@@ -215,6 +213,46 @@ export class TaskListComponent implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  private canEditTask(task: Task): boolean {
+    if (!this.currentUser) return false;
+    if (this.isAdmin) return true;
+    return task.user?.id === this.currentUser.id;
+  }
+
+  private canDeleteTask(task: Task): boolean {
+    if (!this.currentUser || !task.id) return false;
+    if (this.isAdmin) return true;
+    return task.user?.id === this.currentUser.id;
+  }
+
+  private enrichTasksWithStatus(tasks: Task[]): TaskWithStatus[] {
+    return tasks.map(task => ({
+      ...task,
+      statusLabel: this.getStatusLabel(task.status),
+      statusSeverity: this.getStatusSeverity(task.status),
+      ownerName: task.user?.username || '-',
+      description: task.description || '-'
+    }));
+  }
+
+  private getStatusLabel(status: string): string {
+    const option = TASK_STATUS_OPTIONS.find(opt => opt.value === status);
+    return option ? option.label : status;
+  }
+
+  private getStatusSeverity(status: string): string {
+    switch (status) {
+      case 'NEW':
+        return 'info';
+      case 'IN_PROGRESS':
+        return 'warn';
+      case 'DONE':
+        return 'success';
+      default:
+        return '';
+    }
   }
 
   ngOnDestroy(): void {

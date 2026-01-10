@@ -21,3 +21,17 @@ export const TASK_STATUS_OPTIONS_FOR_DROPDOWN = [
   { label: 'Tamamlandı', value: TASK_STATUS.DONE }
 ];
 
+export const TASK_FORM_LABELS = {
+  CREATE: {
+    dialogTitle: 'Yeni Görev',
+    saveButtonLabel: 'Oluştur',
+    successMessage: 'Görev oluşturuldu!',
+    errorMessage: 'Görev oluşturulurken bir hata oluştu!'
+  },
+  EDIT: {
+    dialogTitle: 'Görev Düzenle',
+    saveButtonLabel: 'Güncelle',
+    successMessage: 'Görev güncellendi!',
+    errorMessage: 'Görev güncellenirken bir hata oluştu!'
+  }
+} as const;
