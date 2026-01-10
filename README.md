@@ -1,6 +1,6 @@
 # Task Manager
 
-Backend'de spring boot, ön yüz olarak Angular framework'ü ile geliştirilmiş bir iş takip uygulamasıdır.
+Backend'de spring boot, front end olarak Angular framework'ü ile geliştirilmiş bir iş takip uygulamasıdır.
 
 ## Proje Nasıl Çalıştırılır?
 
