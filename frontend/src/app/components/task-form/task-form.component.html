@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="dialogTitle"
+  [header]="labels.dialogTitle"
   [(visible)]="visible"
   [modal]="true"
   [style]="{ width: '500px' }"
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Admin için kullanıcı seçimi -->
-    <div class="form-group" *ngIf="showUserSelector">
+    <div class="form-group" *ngIf="isAdmin">
       <label for="targetUserId">Görev Sahibi <span class="required">*</span></label>
       <p-dropdown
         id="targetUserId"
@@ -101,7 +101,7 @@
       styleClass="p-button-text"
     ></p-button>
     <p-button
-      [label]="saveButtonLabel"
+      [label]="labels.saveButtonLabel"
       icon="pi pi-check"
       (onClick)="onSave()"
       [loading]="loading"

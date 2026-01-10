@@ -2,7 +2,7 @@
   <div class="header">
     <div>
       <h1>{{ pageTitle }}</h1>
-      <p>Hoş geldiniz, {{ username }}! <span *ngIf="showAdminBadge" class="admin-badge">(Admin yetkisi)</span></p>
+      <p>Hoş geldiniz, {{ username }}! <span *ngIf="isAdmin" class="admin-badge">(Admin yetkisi)</span></p>
     </div>
     <div class="header-actions">
       <p-button

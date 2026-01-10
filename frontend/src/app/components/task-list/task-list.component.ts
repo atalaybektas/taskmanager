@@ -7,7 +7,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
 import { Task, Page, TaskWithStatus } from '../../shared/interfaces/task.interface';
-import { User, Role } from '../../shared/interfaces/user.interface';
+import { User } from '../../shared/interfaces/user.interface';
 import { PaginatorEvent } from '../../shared/interfaces/paginator-event.interface';
 import { PAGINATION_CONSTANTS } from '../../core/constants/pagination.constants';
 import { UI_CONSTANTS } from '../../core/constants/ui.constants';
@@ -24,11 +24,9 @@ import { environment } from '../../../environments/environment';
 export class TaskListComponent implements OnInit, OnDestroy {
   pageTitle = '';
   username = '';
-  showAdminBadge = false;
   totalPages = 0;
   tasksWithStatus: TaskWithStatus[] = [];
   
-  tasks: Task[] = [];
   page: Page<Task> | null = null;
   currentUser: User | null = null;
   selectedStatus: string | null = null;
@@ -60,7 +58,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
     this.isAdmin = this.authService.isAdmin();
     this.username = this.currentUser?.username || '';
     this.pageTitle = this.isAdmin ? 'Tüm Görevler' : 'Görevlerim';
-    this.showAdminBadge = this.isAdmin;
 
     this.loadTasks();
   }
@@ -76,7 +73,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (page: Page<Task>) => {
         this.page = page;
-        this.tasks = page.content;
         this.totalElements = page.totalElements;
         this.currentPage = page.number;
         this.totalPages = page.totalPages;

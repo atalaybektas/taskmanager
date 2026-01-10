@@ -33,11 +33,6 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
   loading = false;
   currentUser: User | null = null;
   isAdmin = false;
-  showUserSelector = false; // admin için kullanıcı seçici göster
-  dialogTitle = ''; 
-  saveButtonLabel = ''; 
-  successMessage = ''; 
-  errorMessage = ''; 
   users: User[] = []; // admin için kullanıcı listesi
   loadingUsers = false;
 
@@ -55,14 +50,6 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.isAdmin = this.authService.isAdmin();
-    this.showUserSelector = this.isAdmin;
-    
-    // edit/create moduna göre label'ları al
-    const labels = this.isEditMode ? TASK_FORM_LABELS.EDIT : TASK_FORM_LABELS.CREATE;
-    this.dialogTitle = labels.dialogTitle;
-    this.saveButtonLabel = labels.saveButtonLabel;
-    this.successMessage = labels.successMessage;
-    this.errorMessage = labels.errorMessage;
     
     if (this.isAdmin) {
       this.loadUsers();
@@ -95,13 +82,6 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(): void {
-    // input değiştiğinde label'ları güncelle
-    const labels = this.isEditMode ? TASK_FORM_LABELS.EDIT : TASK_FORM_LABELS.CREATE;
-    this.dialogTitle = labels.dialogTitle;
-    this.saveButtonLabel = labels.saveButtonLabel;
-    this.successMessage = labels.successMessage;
-    this.errorMessage = labels.errorMessage;
-    
     if (this.taskForm) {
       // form varsa değerleri güncelle
       const hasTargetUserIdField = !!this.taskForm.get('targetUserId');
@@ -156,13 +136,13 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
           this.messageService.add({
             severity: 'success',
             summary: 'Başarılı',
-            detail: this.successMessage
+            detail: this.labels.successMessage
           });
           this.saved.emit();
         },
         error: (error: HttpErrorResponse) => {
           this.loading = false;
-          const errorMessage = getErrorMessage(error, this.errorMessage);
+          const errorMessage = getErrorMessage(error, this.labels.errorMessage);
           if (!environment.production) {
             console.error('Görev kaydetme hatası:', error);
           }
@@ -182,6 +162,11 @@ export class TaskFormComponent implements OnInit, OnChanges, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.taskForm.get(fieldName);
     return field ? field.invalid && field.touched : false;
+  }
+
+  // label'ları dinamik olarak getir
+  get labels() {
+    return this.isEditMode ? TASK_FORM_LABELS.EDIT : TASK_FORM_LABELS.CREATE;
   }
 
   // template helper kullanıcı rolüne göre css class
